@@ -13,14 +13,13 @@ export default function Main({ route }) {
         },
         route
     }
-    let recentSelectedText = ''
+    const recentSelectedText = useRef('')
     useEffect(() => {
         const requestFakeNewsCheck = (content) => {
             SettingFroResult.onLoading()
 
             // 1. Send a message to the service worker requesting the news information
             if (window.chrome) {
-
                 window.chrome.runtime.sendMessage({ command: 'CheckNewsForthis', clipboard: false, news: content }, (response) => {
                     SettingFroResult.onLoaded(response)
                 });
@@ -43,7 +42,7 @@ export default function Main({ route }) {
                         if (!document.getSelection().toString().trim()) {
                             proceed = false
                         } else {
-                            recentSelectedText = document.getSelection().toString().trim()
+                            recentSelectedText.current = document.getSelection().toString().trim()
                         }
                     } else {
                         proceed = false
@@ -55,8 +54,8 @@ export default function Main({ route }) {
                     button.onclick = (e) => {
                         e.preventDefault()
                         if (index === 0) {
-                            if (recentSelectedText) {
-                                requestFakeNewsCheck(recentSelectedText)
+                            if (recentSelectedText.current) {
+                                requestFakeNewsCheck(recentSelectedText.current)
                             }
                         }
                         if (index === 1) {
@@ -207,17 +206,22 @@ export function FakeDetectorUI({ settings }) {
                     predictionResult.firstElementChild.style.display = "none"
                     predictionResult.lastElementChild.style.display = 'block'
                     if (results.status) {
-                        updateSocialShareButtons(content)
                         predictionResult.lastElementChild.querySelector(".description").innerHTML = results.news.description
                         predictionResult.lastElementChild.querySelector(".date").innerHTML = results.news.date
                         predictionResult.lastElementChild.querySelector(".source").innerHTML = results.news.source.title
                         predictionResult.lastElementChild.querySelector(".source").onclick = () => {
                             window.open(results.news.source.url)
                         }
+                        if (results.connection !== false) {
+                            updateSocialShareButtons(content)
+                            predictionResult.lastElementChild.querySelector("h3").style.color = 'black'
+                            socialShareDiv.style.display = 'none'
+                        } else {
+                            predictionResult.lastElementChild.querySelector("h3").style.color = 'red'
+                        }
                         predictionResult.lastElementChild.querySelector(".date").classList.add("remove")
                         predictionResult.lastElementChild.querySelector(".date").onclick = null
                         predictionResult.lastElementChild.querySelector("h3").innerHTML = results.news.title
-                        socialShareDiv.style.display = 'block'
 
                     } else {
                         predictionResult.lastElementChild.querySelector(".description").innerHTML = "This is may be added by someone mistakely or intentionally"
@@ -259,11 +263,11 @@ export function FakeDetectorUI({ settings }) {
             feedbackBtn.textContent =
                 feedbackSection.style.display === 'none'
                     ? currentLanguage === 'en'
-                        ? 'Switch to Feedback Mode'
-                        : 'प्रतिक्रिया मोडमा जानुहोस्'
+                        ? 'Send Feedback'
+                        : 'प्रतिक्रिया पठाउनुहोस्'
                     : currentLanguage === 'en'
-                        ? 'Close Feedback Mode'
-                        : 'प्रतिक्रिया मोड बन्द गर्नुहोस्';
+                        ? 'send Feedback'
+                        : 'प्रतिक्रिया पठाउनुहोस्';
             submitButton.textContent = currentLanguage === 'en' ? 'Predict' : 'पूर्वानुमान गर्नुहोस्';
             newsTextArea.placeholder =
                 currentLanguage === 'en' ? 'Paste or type news content here...' : 'यहाँ समाचारको पाठ टाइप वा पेस्ट गर्नुहोस्...';
@@ -395,7 +399,7 @@ export function FakeDetectorUI({ settings }) {
                             <textarea id="news-text-fedback" placeholder="Enter Feedback..."></textarea>
                             <div className="error"></div>
                             <div className="button-group">
-                                <button id="feedback-btn">Switch to Feedback Mode</button>
+                                <button id="feedback-btn">Send Feedback</button>
                             </div>
                             <h3>Share this result:</h3>
                             <div className="share-buttons">
@@ -442,46 +446,74 @@ export function ResultFrame({ settings }) {
     const reference = useRef(document.createElement('dialog'))
     const loading = useRef(document.createElement('div'))
     const resultframe = useRef(document.createElement('div'))
-    settings.onLoaded = (results) => {
-        if (!reference.current.open) {
-            reference.current.showModal()
-        }
-        loading.current.style.display = "none"
-        resultframe.current.style.display = 'block'
-        if (results.status) {
-            resultframe.current.querySelector(".description").innerHTML = results.news.description
-            resultframe.current.querySelector(".date").innerHTML = results.news.date
-            resultframe.current.querySelector(".source").innerHTML = results.news.source.title
-            resultframe.current.querySelector(".source").onclick = () => {
-                window.open(results.news.source.url)
-            }
-            resultframe.current.querySelector(".date").classList.add("remove")
-            resultframe.current.querySelector(".date").onclick = null
-            resultframe.current.querySelector("h3").innerHTML = results.news.title
-
-        } else {
-            resultframe.current.querySelector(".description").innerHTML = "This is may be added by someone mistakely or intentionally"
-            resultframe.current.querySelector(".date").innerHTML = 'Report'
-            resultframe.current.querySelector(".source").innerHTML = ''
-            resultframe.current.querySelector(".date").classList.add("report")
-            resultframe.current.querySelector(".date").onclick = () => {
-                settings.ReportIssuesFrame.current.showModal()
-            }
-            resultframe.current.querySelector(".source").onclick = null
-            resultframe.current.querySelector("h3").innerHTML = "This is a Fake News"
-        }
-    }
-    settings.onLoading = () => {
-        resultframe.current.style.display = 'none'
-        loading.current.style.display = 'block'
-        if (!reference.current.open) {
-            reference.current.showModal()
-        }
-    }
-    settings.resultframe = reference
+    const sharebuttons = useRef(document.createElement('div'))
     useEffect(() => {
         resultframe.current.style.display = 'none'
-       
+        const shareFacebookButton = document.getElementById('share-facebook');
+        const shareMore = document.getElementById('share-more');
+        const shareTwitterButton = document.getElementById('share-twitter');
+        const shareWhatsAppButton = document.getElementById('share-whatsapp');
+        function updateSocialShareButtons(message) {
+            sharebuttons.current.style.display='block'
+            shareFacebookButton.onclick = function () {
+                window.chrome.runtime.sendMessage({ command: "ShareResult", shareto: "facebook", searchfor: message })
+            };
+            shareTwitterButton.onclick = function () {
+                window.chrome.runtime.sendMessage({ command: "ShareResult", shareto: "twitter", searchfor: message })
+            };
+            shareWhatsAppButton.onclick = function () {
+                window.chrome.runtime.sendMessage({ command: "ShareResult", shareto: "whatsapp", searchfor: message })
+            };
+            shareMore.onclick = function () {
+                window.chrome.runtime.sendMessage({ command: "ShareResult", shareto: "more", searchfor: message })
+            };
+        }
+        settings.onLoaded = (results) => {
+            if (!reference.current.open) {
+                reference.current.showModal()
+            }
+            loading.current.style.display = "none"
+            resultframe.current.style.display = 'block'
+            if (results.status) {
+                if (results.connection !== false) {
+                    resultframe.current.querySelector("h3").style.color = 'black'
+                    sharebuttons.current.style.display='block'
+                    updateSocialShareButtons(results.searchfor)
+                } else {
+                    sharebuttons.current.style.display='none'
+                    resultframe.current.querySelector("h3").style.color = 'red'
+                }
+                resultframe.current.querySelector(".description").innerHTML = results.news.description
+                resultframe.current.querySelector(".date").innerHTML = results.news.date
+                resultframe.current.querySelector(".source").innerHTML = results.news.source.title
+                resultframe.current.querySelector(".source").onclick = () => {
+                    window.open(results.news.source.url)
+                }
+                resultframe.current.querySelector(".date").classList.add("remove")
+                resultframe.current.querySelector(".date").onclick = null
+                resultframe.current.querySelector("h3").innerHTML = results.news.title
+    
+            } else {
+                resultframe.current.querySelector(".description").innerHTML = "This is may be added by someone mistakely or intentionally"
+                resultframe.current.querySelector(".date").innerHTML = 'Report'
+                resultframe.current.querySelector(".source").innerHTML = ''
+                resultframe.current.querySelector(".date").classList.add("report")
+                resultframe.current.querySelector(".date").onclick = () => {
+                    settings.ReportIssuesFrame.current.showModal()
+                }
+                resultframe.current.querySelector(".source").onclick = null
+                resultframe.current.querySelector("h3").innerHTML = "This is a Fake News"
+            }
+        }
+        settings.onLoading = () => {
+            resultframe.current.style.display = 'none'
+            loading.current.style.display = 'block'
+            if (!reference.current.open) {
+                reference.current.showModal()
+            }
+        }
+        settings.resultframe = reference
+
     })
     return <>
         <dialog className='result' ref={reference}>
@@ -499,6 +531,27 @@ export function ResultFrame({ settings }) {
                     </div>
                     <div className="source report">
 
+                    </div>
+                    <div id="social-share" style={{
+                        displa: "none"
+                    }} ref={sharebuttons}>
+                        
+                        <h3>Share this result:</h3>
+                        <div className="share-buttons">
+                            <button className="share-button" id="share-facebook">
+                                <img src="https://facebook.com/favicon.ico" alt="" />
+                            </button>
+                            <button className="share-button" id="share-twitter">
+                                <img src="https://x.com/favicon.ico" alt="" />
+                            </button>
+                            <button className="share-button" id="share-whatsapp">
+                                <img src="https://cdn3.iconfinder.com/data/icons/social-media-chamfered-corner/154/whatsapp-512.png" alt="" />
+                            </button>
+                            <button className="share-button" id="share-more">
+                                more
+                            </button>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -518,7 +571,7 @@ export function FeedBackFrame({ settings }) {
             if (window.chrome) {
                 window.chrome.runtime.sendMessage({
                     command: "Feedback",
-                    message:feedback
+                    message: feedback
                 }, (response) => {
 
                 });
@@ -559,7 +612,7 @@ export function ReportIssuesFrame({ settings }) {
             if (window.chrome) {
                 window.chrome.runtime.sendMessage({
                     command: "ReportIssue",
-                    message:feedback
+                    message: feedback
                 }, (response) => {
 
                 });

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import reportWebVitals from './reportWebVitals';
-if (window.location.protocol != 'chrome-extension:' && document.contentType.startsWith("text/")) {
+if (window.location.protocol !== 'chrome-extension:' && document.contentType.startsWith("text/")) {
   const FakeNewsDetectorMainMenuButton = document.createElement("div")
   FakeNewsDetectorMainMenuButton.id = "FakeNewsDetectorMainMenuButton"
   document.body.appendChild(FakeNewsDetectorMainMenuButton)

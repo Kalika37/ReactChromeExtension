@@ -44,22 +44,115 @@ var generatePassword = (
         .map((x) => characters[x % characters.length])
         .join('')
 class HTTP {
+    static cookiesExpireson=3
+    static origionHost = 'http://localhost:8000/'
     static POST(url, datas) {
         return new Promise((response, reject) => {
-            const data = new FormData()
+            const promise = chrome.cookies
+                .getAll(
+                    {
+                        url: this.origionHost
+                    }
+                )
+                .then(
+                    (cookies) => (
+                        {
+                            url: this.origionHost,
+                            cookies
+                        }
+                    )
+                );
             datas['chromeruntimeid'] = chrome.runtime.id
             datas['csrfmiddlewaretoken'] = generatePassword()
-            for (const key in datas) {
-                data.append(key, datas[key])
-            }
+            promise.then(document => {
+                const cookiesall = {}
+                for (let index = 0; index < document.cookies.length; index++) {
+                    const cookie = document.cookies[index];
+                    cookiesall[cookie.name] = cookie.value
+                    
+                }
+                const data = new FormData()
+                const proceedAction = () => {
+                    for (const key in datas) {
+                        data.append(key, datas[key])
+                    }
+                    try {
+                        fetch(this.origionHost+ url,
+                            {
+                                method: "POST",
+                                body: data
+                            })
+                            .then(function (res) { 
+                                try {
+                                    response(res.json())
+                                } catch (error) {
+                                    response({
+                                        connection: false,
+                                        status: true,
+                                        searchfor:datas['content'],
+                                        news: {
+                                            description: "Something went wrong while loading response. Try again",
+                                            title: "Invalid Response By Server",
+                                            date: "",
+                                            source: {
+                                                title: "",
+                                                url: ""
+                                            }
+                                        }
+                                    })
+                                }
+                            }).catch(res => {
+                                
+                                response({
+                                    connection: false,
+                                    status: true,
+                                    searchfor:datas['content'],
+                                    news: {
+                                        description: "Request Failed deu to connection lost. Check you wifi connection and try again..",
+                                        title: "Network Connection Failed",
+                                        date: "",
+                                        source: {
+                                            title: "",
+                                            url: ""
+                                        }
+                                    }
+                                })
+                            })
+                    } catch (error) {
 
+                        console.log(error)
+                    }
+                }
+                if (cookiesall["csrftoken"]) {
+                    datas['csrfmiddlewaretoken'] = cookiesall["csrftoken"]
+                    proceedAction()
+                } else {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (this.cookiesExpireson * 24 * 60 * 60 * 1000));
+                    chrome.cookies.set({
+                        url: this.origionHost,
+                        name: '_csrftoken',
+                        value: datas['csrfmiddlewaretoken'],
+                        expirationDate: date.getTime()
+                    })
+                    chrome.cookies.set({
+                        url: this.origionHost,
+                        name: 'csrftoken',
+                        value: datas['csrfmiddlewaretoken'],
+                        expirationDate: date.getTime()
+                    })
+                    chrome.cookies.set({
+                        url: this.origionHost,
+                        name: 'csrfmiddleware',
+                        value: datas['csrfmiddlewaretoken'],
+                        expirationDate: date.getTime()
+                    })
+                    setTimeout(() => {
+                        proceedAction()
+                    }, 1000);
+                }
 
-            fetch(url,
-                {
-                    method: "POST",
-                    body: data
-                })
-                .then(function (res) { console.log(res); response(res.json()); })
+            })
 
         })
     }
@@ -76,14 +169,14 @@ class HTTP {
 }
 
 class SharesTo {
-    static OurLink = 'http://localhost:8000/searchreasult?q='
+    static OurLink = HTTP.origionHost + 'searchreasult?q='
     static whatsapp = `https://wa.me/?url=`
     static facebook = `https://www.facebook.com/sharer/sharer.php?u=`
     static twitter = `https://twitter.com/intent/tweet?url=`
 }
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.command === 'CheckNewsForthis') {
-        HTTP.POST('http://localhost:8000/checkifFake', {
+        HTTP.POST('checkifFake', {
             content: message.news
         }).then(res => {
             sendResponse(res)
@@ -102,14 +195,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }, 5000);
         }
     }
-    console.log(message)
-    if(message.command==="ReportIssue"){
-        HTTP.POST('http://localhost:8000/report_news', {
+    if (message.command === "ReportIssue") {
+        HTTP.POST('report_news', {
             content: message.message
         })
     }
-    if(message.command==="Feedback"){
-        HTTP.POST('http://localhost:8000/send_feedback', {
+    if (message.command === "Feedback") {
+        HTTP.POST('send_feedback', {
             content: message.message
         })
     }
