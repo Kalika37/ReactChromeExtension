@@ -1,0 +1,347 @@
+#FakeNewsDetectorMainMenuButton {
+    position: fixed;
+    right: 0px;
+    bottom: calc(100vh / 2 - 25px);
+    height: 60px;
+    width: 30px;
+    background-color: antiquewhite !important;
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.479);
+    -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.397);
+    -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.288);
+    z-index: 9998989898;
+    overflow: hidden;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    cursor: pointer;
+}
+
+#FakeNewsDetectorMainMenuButton:hover {
+    background-color: lightblue !important;
+}
+
+#FakeNewsDetectorMainMenuButton::selection {
+    background-color: transparent;
+}
+
+#FakeNewsDetectorMainMenuButton img {
+    height: 50px;
+    width: 30px;
+}
+
+#FakeNewsDetectorMainMenuButton .inner {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+#FakeNewsDetectorMainMenuButton .inner svg {
+    height: 40px;
+    width: 20px;
+}
+
+.mainMenuFrame {
+    position: fixed;
+    z-index: 999999 !important;
+    color: white;
+    font-size: 15px;
+    /* padding: 20px; */
+    border: none;
+    outline: 0;
+    height: fit-content !important;
+    width: fit-content !important;
+    background-color: transparent !important;
+    min-width: 100px;
+    overflow: visible;
+}
+
+.mainMenuFrame .menus {
+    display: flex;
+    flex-direction: column;
+}
+
+.mainMenuFrame .menus .option {
+    padding: 5px 15px;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(173, 216, 230, 0.274);
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.mainMenuFrame .menus .option img {
+    height: 20px;
+    width: 20px;
+}
+
+.mainMenuFrame.menu .texter {
+    padding-left: 0px;
+    padding-right: 0px;
+
+}
+
+.mainMenuFrame .menus .option:hover,
+.mainMenuFrame .menus .option.active {
+    background-color: rgb(0 255 255 / 18%);
+}
+
+.mainMenuFrame .texter {
+    background-color: rgb(122, 74, 10);
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.479);
+    padding: 10px;
+    border-radius: 2px;
+    display: flex;
+    width: 100%;
+    min-width: max-content;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: rgb(255, 255, 255);
+    min-height: 40px;
+
+}
+
+.mainMenuFrame button:hover,
+.mainMenuFrame button:focus,
+.mainMenuFrame button.focused,
+.formatter-frame .tool-button:hover,
+.formatter-frame .tool-button:focus,
+.formatter-frame .tool-button.focussed {
+    cursor: pointer;
+    background-color: rgb(0 255 255 / 18%);
+    outline: 0;
+    color: white;
+
+}
+
+.mainMenuFrame .texter.tooltip {
+    align-items: center;
+}
+
+
+.mainMenuFrame .right {
+    display: block;
+    position: absolute;
+    top: 32px;
+    /* left: 210px; */
+    right: -50px;
+    width: 0;
+    height: 0;
+    border: 11px solid transparent;
+    border-left: 20px solid rgb(122, 74, 10);
+    top: 77.5px;
+    margin: 20px;
+}
+
+
+.mainMenuFrame button {
+    font-size: 17px;
+    color: white;
+    font-weight: 600;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    margin: 0px;
+    padding-right: 30px;
+    border: none;
+    background-color: transparent;
+    width: 100%;
+    min-height: 30px;
+    text-align: left;
+    border-bottom: 1px solid rgba(173, 216, 230, 0.274);
+}
+
+.mainMenuFrame button .icon svg {
+    height: 20px;
+    width: 20px;
+}
+
+.mainMenuFrame button:disabled {
+    opacity: 0.6;
+    background-color: rgb(122, 74, 10) !important;
+}
+
+.mainMenuFrame button .icon img {
+    height: 20px;
+    width: 20px;
+}
+
+.mainMenuFrame button {
+    padding-left: 40px;
+}
+
+dialog.result {
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.479);
+    -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.397);
+    -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.288);
+    border: none;
+    outline: 0;
+    min-width: 150px;
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    padding-right: 0px;
+
+}
+
+fieldset textarea {
+    border: none !important;
+    outline: none !important;
+    margin: 0px !important;
+    padding: 3px;
+    font-size: 15px;
+    min-width: 220px;
+}
+
+fieldset legend {
+    color: rgb(0, 102, 255);
+    font-size: 15px;
+}
+
+dialog.Response {
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.479);
+    -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.397);
+    -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.288);
+    border: none;
+    outline: 0;
+    min-width: 150px;
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+}
+
+dialog.Response .main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    min-width: 150px;
+
+}
+
+dialog.Response button {
+    border: 1px solid blue;
+    margin: 0px;
+    color: blue;
+}
+
+dialog.Response button:hover {
+    background-color: blue;
+    color: white;
+}
+
+fieldset {
+    width: 100%;
+}
+
+.error {
+    color: red;
+}
+
+fieldset input:-webkit-autofill,
+fieldset input:-webkit-autofill:hover,
+fieldset input:-webkit-autofill:focus,
+fieldset input:-webkit-autofill:active,
+fieldset textarea:-webkit-autofill,
+fieldset textarea:-webkit-autofill:hover,
+fieldset textarea:-webkit-autofill:focus,
+fieldset textarea:-webkit-autofill:active,
+fieldset select:-webkit-autofill,
+fieldset select:-webkit-autofill:hover,
+fieldset select:-webkit-autofill:focus,
+fieldset select:-webkit-autofill:active,
+fieldset input:hover,
+fieldset input:focus,
+fieldset textarea:hover,
+fieldset textarea:focus {
+    transition: all 5000s ease-in-out 0s;
+    outline: 0 !important;
+    transition-property: background-color, color;
+    border: none !important;
+    outline: none !important;
+    margin: 0px !important;
+    box-shadow: 0 0 0px transparent !important;
+}
+.content-component {
+    max-height: 400px;
+    padding-right: 5px;
+    overflow-y: scroll;
+
+}
+
+.content-component  .description {
+    text-align: justify;
+}
+.loadingicon{
+    text-align: center;
+}
+.content-component  .report {
+    color: rgb(0, 217, 255);
+}
+
+.content-component  .report:hover {
+    text-decoration: underline;
+}
+.content-component h3{
+    text-align: left;
+    font-weight: 800;
+}
+.content-component  .date {
+    font-weight: 600;
+    width: 100%;
+    text-align: right;
+}
+
+.content-component  .inner {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+dialog.mainMenuFrame {
+    left: calc(100vw - 200px);
+    z-index: 9998;
+    min-height: 40px !important;
+    overflow: hidden;
+}
+
+dialog::backdrop {
+    opacity: 0px;
+    background-color: transparent;
+}
+
+#FakeNewsDetectorMainMenuButton dialog *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+/* Track */
+#FakeNewsDetectorMainMenuButton dialog *::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+#FakeNewsDetectorMainMenuButton dialog *::-webkit-scrollbar-thumb {
+    background: #8cd1f1;
+    border-radius: 10px;
+}
+
+#FakeNewsDetectorMainMenuButton dialog *::-webkit-scrollbar:hover {
+    width: 10px;
+    height: 10px;
+}
+
+#FakeNewsDetectorMainMenuButton dialog *::-webkit-scrollbar-thumb:hover {
+    width: 10px;
+    height: 10px;
+    background: #8cd1f1;
+}
